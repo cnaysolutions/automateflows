@@ -273,7 +273,7 @@ section { padding: 6rem 4rem; }
 
 /* Portfolio */
 .portfolio-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 2rem;
 }
 .portfolio-card {
@@ -312,17 +312,6 @@ section { padding: 6rem 4rem; }
   -webkit-text-fill-color: transparent;
 }
 .portfolio-stat span { font-size: 0.75rem; color: var(--text-dim); }
-.portfolio-links { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); }
-.portfolio-link {
-  display: inline-flex; align-items: center; gap: 0.3rem;
-  padding: 0.35rem 0.8rem; border-radius: 6px;
-  background: rgba(108, 99, 255, 0.08);
-  border: 1px solid rgba(108, 99, 255, 0.15);
-  font-size: 0.75rem; color: var(--accent);
-  text-decoration: none; font-weight: 500;
-  transition: all 0.3s;
-}
-.portfolio-link:hover { background: rgba(108, 99, 255, 0.15); border-color: var(--accent); }
 
 /* Pricing */
 .pricing-grid {
@@ -505,7 +494,7 @@ footer {
 
 <!-- Stats -->
 <div class="stats">
-  <div class="stat"><div class="stat-number">8+</div><div class="stat-label">Live automation systems</div></div>
+  <div class="stat"><div class="stat-number">5+</div><div class="stat-label">Automation systems built</div></div>
   <div class="stat"><div class="stat-number">310+</div><div class="stat-label">AI prompts engineered</div></div>
   <div class="stat"><div class="stat-number">24/7</div><div class="stat-label">Systems run autonomously</div></div>
   <div class="stat"><div class="stat-number">40h+</div><div class="stat-label">Saved per month, per client</div></div>
@@ -591,93 +580,38 @@ footer {
   <div class="section-subtitle">These aren't concepts — they're live systems running 24/7 right now.</div>
   <div class="portfolio-grid">
     <div class="portfolio-card">
+      <div class="portfolio-header">🏔️</div>
+      <div class="portfolio-tags">
+        <span class="portfolio-tag">AI Images</span>
+        <span class="portfolio-tag">Video Animation</span>
+        <span class="portfolio-tag">Auto-post</span>
+        <span class="portfolio-tag">Cron Jobs</span>
+      </div>
+      <div class="portfolio-content">
+        <h3>Travel & Nature Auto-Poster</h3>
+        <p>Fully automated system generating AI landscape images, animating them into videos with audio, and posting to Facebook + Instagram with rotating hashtags and captions — daily, hands-free.</p>
+        <div class="portfolio-stats">
+          <div class="portfolio-stat"><strong>310</strong><span>AI prompts</span></div>
+          <div class="portfolio-stat"><strong>2</strong><span>platforms</span></div>
+          <div class="portfolio-stat"><strong>0</strong><span>manual work</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="portfolio-card">
       <div class="portfolio-header">🍽️</div>
       <div class="portfolio-tags">
         <span class="portfolio-tag">3 Websites</span>
         <span class="portfolio-tag">AI Menus</span>
         <span class="portfolio-tag">Bilingual</span>
         <span class="portfolio-tag">Multi-platform</span>
-        <span class="portfolio-tag">Supabase</span>
       </div>
       <div class="portfolio-content">
         <h3>Daily Menu Platform</h3>
-        <p>AI generates daily menus (soup, main course, salad & side dish) with AI-generated food photos, bilingual cooking steps, and community kitchen features. Auto-posts to Facebook, Instagram & X/Twitter — including Stories. Serves 3 websites with unique content daily.</p>
+        <p>AI generates daily menus with bilingual cooking steps, auto-posts to 3 Facebook pages, 2 Instagram accounts, and X/Twitter — including Stories. Serves 3 websites with unique content daily.</p>
         <div class="portfolio-stats">
           <div class="portfolio-stat"><strong>3</strong><span>websites</span></div>
-          <div class="portfolio-stat"><strong>5+</strong><span>social accounts</span></div>
+          <div class="portfolio-stat"><strong>5</strong><span>social accounts</span></div>
           <div class="portfolio-stat"><strong>Daily</strong><span>fresh content</span></div>
-        </div>
-        <div class="portfolio-links">
-          <a href="https://www.dailymenuforall.com" class="portfolio-link" target="_blank">🌐 dailymenuforall.com</a>
-          <a href="https://www.gunlukmenu.com" class="portfolio-link" target="_blank">🌐 gunlukmenu.com</a>
-          <a href="https://www.dailyhalalmenu.com" class="portfolio-link" target="_blank">🌐 dailyhalalmenu.com</a>
-          <a href="https://www.instagram.com/dailymenuforall/" class="portfolio-link" target="_blank">📸 Instagram</a>
-        </div>
-      </div>
-    </div>
-    <div class="portfolio-card">
-      <div class="portfolio-header">🏔️</div>
-      <div class="portfolio-tags">
-        <span class="portfolio-tag">AI Images</span>
-        <span class="portfolio-tag">Video Animation</span>
-        <span class="portfolio-tag">Auto-post</span>
-        <span class="portfolio-tag">Trip Planner</span>
-      </div>
-      <div class="portfolio-content">
-        <h3>Best Travel Plan</h3>
-        <p>Two-part project: a full-stack travel cost planning web app built with React, TypeScript & Supabase — plus a fully automated system generating AI landscape images, animating them into videos with audio, and posting to Instagram with rotating hashtags and captions daily.</p>
-        <div class="portfolio-stats">
-          <div class="portfolio-stat"><strong>126</strong><span>commits</span></div>
-          <div class="portfolio-stat"><strong>310+</strong><span>AI prompts</span></div>
-          <div class="portfolio-stat"><strong>0</strong><span>manual work</span></div>
-        </div>
-        <div class="portfolio-links">
-          <a href="https://best-travel-plan-kvuc.vercel.app" class="portfolio-link" target="_blank">🌐 Web App</a>
-          <a href="https://www.instagram.com/besttravelplan_landscapshare/" class="portfolio-link" target="_blank">📸 Instagram</a>
-        </div>
-      </div>
-    </div>
-    <div class="portfolio-card">
-      <div class="portfolio-header">📺</div>
-      <div class="portfolio-tags">
-        <span class="portfolio-tag">n8n Workflows</span>
-        <span class="portfolio-tag">AI Video</span>
-        <span class="portfolio-tag">AI Voice</span>
-        <span class="portfolio-tag">Hetzner VPS</span>
-        <span class="portfolio-tag">Whisper AI</span>
-      </div>
-      <div class="portfolio-content">
-        <h3>Longevity Decoded — YouTube Channel</h3>
-        <p>Fully automated YouTube channel pipeline: select a topic in n8n, AI does keyword research & competitor analysis, generates scripts, produces AI voice & video clips, adds subtitles via Whisper AI, edits everything together, and auto-uploads to YouTube. Zero manual editing.</p>
-        <div class="portfolio-stats">
-          <div class="portfolio-stat"><strong>~€50</strong><span>/month cost</span></div>
-          <div class="portfolio-stat"><strong>30min</strong><span>topic to upload</span></div>
-          <div class="portfolio-stat"><strong>0</strong><span>manual editing</span></div>
-        </div>
-        <div class="portfolio-links">
-          <a href="https://www.youtube.com/@LongevityDecoded-tier3" class="portfolio-link" target="_blank">📺 YouTube</a>
-        </div>
-      </div>
-    </div>
-    <div class="portfolio-card">
-      <div class="portfolio-header">🌿</div>
-      <div class="portfolio-tags">
-        <span class="portfolio-tag">AI Video</span>
-        <span class="portfolio-tag">AI Voice Clone</span>
-        <span class="portfolio-tag">Instagram</span>
-        <span class="portfolio-tag">YouTube</span>
-      </div>
-      <div class="portfolio-content">
-        <h3>Plant Warrior — Indoor Plant Tips</h3>
-        <p>AI-powered content channel sharing tips & tricks about indoor plants. Uses a one-time voice sample to generate new AI voiceovers for every video topic automatically. Fully AI-generated content — from script to voice to final video — posted to Instagram and YouTube.</p>
-        <div class="portfolio-stats">
-          <div class="portfolio-stat"><strong>1x</strong><span>voice sample</span></div>
-          <div class="portfolio-stat"><strong>100%</strong><span>AI generated</span></div>
-          <div class="portfolio-stat"><strong>2</strong><span>platforms</span></div>
-        </div>
-        <div class="portfolio-links">
-          <a href="https://www.instagram.com/plantwarriorlive/" class="portfolio-link" target="_blank">📸 Instagram</a>
-          <a href="https://www.youtube.com/@plantwarriorlive" class="portfolio-link" target="_blank">📺 YouTube</a>
         </div>
       </div>
     </div>
