@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Words Between Silence — AI Music Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --accent: #7c5cfc;
+  --accent2: #c45cfc;
+  --accent3: #5cf0fc;
+  --text: #e8e6f0;
+  --text-muted: #8b889a;
+  --gold: #f0c850;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+.noise {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  background: radial-gradient(ellipse at 30% 20%, rgba(124,92,252,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 80%, rgba(196,92,252,0.08) 0%, transparent 60%);
+}
+
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 120px, rgba(124,92,252,0.03) 120px, rgba(124,92,252,0.03) 121px);
+  pointer-events: none;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.4rem 1.2rem;
+  border: 1px solid rgba(124,92,252,0.3);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s ease both;
+}
+
+.badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.8s ease 0.1s both;
+}
+
+h1 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.8s ease 0.2s both;
+  font-weight: 300;
+}
+
+.cta-row {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  animation: fadeUp 0.8s ease 0.3s both;
+}
+
+.cta {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.cta-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+}
+
+.cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,92,252,0.3); }
+
+.cta-secondary {
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text);
+}
+
+.cta-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+section { padding: 5rem 2rem; }
+
+.container { max-width: 900px; margin: 0 auto; }
+
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+h2 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-sub {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 3rem;
+  font-weight: 300;
+}
+
+/* PIPELINE */
+.pipeline {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.pipeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2), var(--accent3), var(--gold));
+}
+
+.step {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 2rem;
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.step:hover {
+  border-color: rgba(124,92,252,0.2);
+  transform: translateX(4px);
+}
+
+.step::before {
+  content: attr(data-num);
+  position: absolute;
+  left: -2.55rem; top: 1.5rem;
+  width: 28px; height: 28px;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.step-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.step-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.step-tech {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  margin-top: 0.8rem;
+  padding: 0.25rem 0.8rem;
+  background: rgba(124,92,252,0.08);
+  border: 1px solid rgba(124,92,252,0.15);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* TECH STACK */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.tech-card {
+  padding: 1.8rem;
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+  border-color: rgba(124,92,252,0.2);
+  transform: translateY(-3px);
+}
+
+.tech-icon {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.tech-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.tech-role {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 300;
+}
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.stat {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+  font-weight: 300;
+}
+
+/* ACCESS */
+.access-box {
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(196,92,252,0.05));
+  border: 1px solid rgba(124,92,252,0.2);
+  border-radius: 16px;
+  text-align: center;
+}
+
+.access-links {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<section class="hero">
+  <canvas id="visualizer"></canvas>
+  <div class="badge" style="position:relative; z-index:2;">Live & Automated</div>
+  <h1 style="position:relative; z-index:2;">Words Between <span>Silence</span></h1>
+  <p class="subtitle" style="position:relative; z-index:2;">A fully automated AI music YouTube channel. Every 5 hours, an emotional song is born — composed, visualized, uploaded, and shared — without any human touch.</p>
+  <div class="cta-row" style="position:relative; z-index:2;">
+    <a href="https://www.youtube.com/@WordsBetweenSilence" class="cta cta-primary" target="_blank">▶ Watch on YouTube</a>
+    <a href="https://x.com/Ibrahim60527521" class="cta cta-secondary" target="_blank">𝕏 Follow Updates</a>
+  </div>
+</section>
+
+<style>
+#visualizer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  opacity: 0.6;
+}
+</style>
+
+<script>
+(function() {
+  const canvas = document.getElementById('visualizer');
+  const ctx = canvas.getContext('2d');
+  let W, H, bars = [], particles = [], t = 0;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Create bar data
+  const BAR_COUNT = 64;
+  for (let i = 0; i < BAR_COUNT; i++) {
+    bars.push({
+      freq: 0.3 + Math.random() * 2.5,
+      phase: Math.random() * Math.PI * 2,
+      amp: 0.3 + Math.random() * 0.7,
+      smoothH: 0
+    });
+  }
+
+  // Floating particles
+  for (let i = 0; i < 40; i++) {
+    particles.push({
+      x: Math.random() * 1,
+      y: Math.random() * 1,
+      r: 1 + Math.random() * 2.5,
+      vx: (Math.random() - 0.5) * 0.0003,
+      vy: -0.0002 - Math.random() * 0.0005,
+      alpha: 0.15 + Math.random() * 0.35,
+      hue: Math.random() > 0.5 ? 260 : 190
+    });
+  }
+
+  function draw() {
+    t += 0.012;
+    ctx.clearRect(0, 0, W, H);
+
+    // --- CIRCULAR VISUALIZER ---
+    const cx = W / 2;
+    const cy = H * 0.48;
+    const baseR = Math.min(W, H) * 0.18;
+    const maxBarH = Math.min(W, H) * 0.14;
+
+    // Glow behind the circle
+    const glow = ctx.createRadialGradient(cx, cy, baseR * 0.3, cx, cy, baseR + maxBarH * 1.2);
+    glow.addColorStop(0, 'rgba(124, 92, 252, 0.06)');
+    glow.addColorStop(0.5, 'rgba(196, 92, 252, 0.03)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw bars radiating from circle
+    for (let i = 0; i < BAR_COUNT; i++) {
+      const b = bars[i];
+      const angle = (i / BAR_COUNT) * Math.PI * 2 - Math.PI / 2;
+
+      // Simulate audio levels with layered sine waves
+      const raw = Math.abs(
+        Math.sin(t * b.freq + b.phase) * 0.5 +
+        Math.sin(t * b.freq * 1.7 + b.phase * 0.5) * 0.3 +
+        Math.sin(t * 0.8 + i * 0.15) * 0.2
+      ) * b.amp;
+
+      // Smooth
+      b.smoothH += (raw - b.smoothH) * 0.12;
+      const barH = b.smoothH * maxBarH;
+
+      const x1 = cx + Math.cos(angle) * baseR;
+      const y1 = cy + Math.sin(angle) * baseR;
+      const x2 = cx + Math.cos(angle) * (baseR + barH);
+      const y2 = cy + Math.sin(angle) * (baseR + barH);
+
+      // Color gradient per bar
+      const hue = 260 + (i / BAR_COUNT) * 120;
+      const alpha = 0.4 + b.smoothH * 0.5;
+      ctx.strokeStyle = `hsla(${hue}, 80%, 65%, ${alpha})`;
+      ctx.lineWidth = Math.max(2, (W / BAR_COUNT) * 0.35);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // Mirror inside
+      const x3 = cx + Math.cos(angle) * (baseR - barH * 0.35);
+      const y3 = cy + Math.sin(angle) * (baseR - barH * 0.35);
+      ctx.strokeStyle = `hsla(${hue}, 80%, 65%, ${alpha * 0.25})`;
+      ctx.lineWidth = Math.max(1, (W / BAR_COUNT) * 0.2);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x3, y3);
+      ctx.stroke();
+    }
+
+    // Inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, baseR * 0.97, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(124, 92, 252, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, baseR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(124, 92, 252, 0.08)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // --- FLOATING PARTICLES ---
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+      if (p.x < -0.05 || p.x > 1.05) { p.x = Math.random(); p.y = 1.05; }
+
+      const px = p.x * W;
+      const py = p.y * H;
+      const flicker = 0.7 + Math.sin(t * 3 + p.phase) * 0.3;
+
+      ctx.beginPath();
+      ctx.arc(px, py, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 70%, 70%, ${p.alpha * flicker})`;
+      ctx.fill();
+    }
+
+    // --- WAVEFORM at bottom ---
+    ctx.beginPath();
+    const waveY = H * 0.82;
+    const waveAmp = 15;
+    for (let x = 0; x < W; x += 2) {
+      const nx = x / W;
+      const y = waveY +
+        Math.sin(nx * 8 + t * 1.5) * waveAmp * 0.5 +
+        Math.sin(nx * 14 - t * 2.2) * waveAmp * 0.3 +
+        Math.sin(nx * 22 + t * 0.7) * waveAmp * 0.15;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = 'rgba(124, 92, 252, 0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Second wave
+    ctx.beginPath();
+    for (let x = 0; x < W; x += 2) {
+      const nx = x / W;
+      const y = waveY +
+        Math.sin(nx * 6 - t * 1.1) * waveAmp * 0.4 +
+        Math.sin(nx * 18 + t * 1.8) * waveAmp * 0.2;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = 'rgba(196, 92, 252, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<section>
+  <div class="container">
+    <h2>How It <span>Works</span></h2>
+    <p class="section-sub">From a single emotional sentence to a full YouTube music video — entirely automated, running 24/7 on a Hetzner VPS.</p>
+
+    <div class="pipeline">
+      <div class="step" data-num="1">
+        <div class="step-title">Pick a Random Lyric</div>
+        <div class="step-desc">One sentence is selected from a pool of 100 emotional phrases — "Don't go, please", "I still feel you", "Forever starts now" — each a raw human feeling distilled into words.</div>
+        <div class="step-tech">n8n Code Node</div>
+      </div>
+
+      <div class="step" data-num="2">
+        <div class="step-title">Build the Music Prompt</div>
+        <div class="step-desc">The lyric is wrapped in a structured prompt: instrumental intro, whispered vocal, emotional drops, and a fading outro. One of 20 diverse styles is randomly chosen — from tropical house to hip hop trap, K-pop to jazz fusion.</div>
+        <div class="step-tech">n8n Code Node — 20 Genres</div>
+      </div>
+
+      <div class="step" data-num="3">
+        <div class="step-title">Generate the Song</div>
+        <div class="step-desc">The prompt is sent to Suno AI via sunoapi.org. The V4.5-ALL model generates a full 2–4 minute track with vocals, instrumentation, and musical structure. Two tracks are generated; the longest is selected.</div>
+        <div class="step-tech">Suno AI — sunoapi.org</div>
+      </div>
+
+      <div class="step" data-num="4">
+        <div class="step-title">Generate AI Cover Art</div>
+        <div class="step-desc">A unique album cover is created using FLUX.1-schnell, with the image prompt dynamically built from the song's mood and lyric — neon cityscapes for future bass, ocean depths for deep house, cosmic landscapes for progressive.</div>
+        <div class="step-tech">SiliconFlow — FLUX.1-schnell</div>
+      </div>
+
+      <div class="step" data-num="5">
+        <div class="step-title">Create the Video</div>
+        <div class="step-desc">The cover art and audio are combined into a 1920×1080 HD MP4 using FFmpeg, running on a dedicated Python HTTP server. The result: a proper YouTube music video with full-quality audio.</div>
+        <div class="step-tech">FFmpeg — Python Server</div>
+      </div>
+
+      <div class="step" data-num="6">
+        <div class="step-title">Upload to YouTube</div>
+        <div class="step-desc">The video is automatically uploaded to the Words Between Silence channel via YouTube's OAuth API, with a generated title, description, hashtags, and category (Music).</div>
+        <div class="step-tech">YouTube Data API v3</div>
+      </div>
+
+      <div class="step" data-num="7">
+        <div class="step-title">Post to X / Twitter</div>
+        <div class="step-desc">A tweet is automatically composed and posted with the YouTube link, song title, style, and hashtags — sharing the new track with the world.</div>
+        <div class="step-tech">X API v2 — Tweepy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>The <span>Tech Stack</span></h2>
+    <p class="section-sub">Built with open-source tools and cloud APIs — running on a single VPS.</p>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">🔧</div>
+        <div class="tech-name">n8n</div>
+        <div class="tech-role">Workflow orchestration — 13 nodes, webhook-triggered, self-hosted on Docker</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🎵</div>
+        <div class="tech-name">Suno AI</div>
+        <div class="tech-role">AI music generation via sunoapi.org — V4.5-ALL model, 2–4 min tracks with vocals</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🎨</div>
+        <div class="tech-name">SiliconFlow</div>
+        <div class="tech-role">AI cover art generation — FLUX.1-schnell, unique 1024×1024 images per song</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🎬</div>
+        <div class="tech-name">FFmpeg</div>
+        <div class="tech-role">Video creation — combines cover + audio into 1920×1080 HD MP4, running as systemd service</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">📺</div>
+        <div class="tech-name">YouTube API</div>
+        <div class="tech-role">Automated upload with OAuth2 — title, description, category, public visibility</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🐦</div>
+        <div class="tech-name">X / Twitter</div>
+        <div class="tech-role">Cross-posting via Tweepy — automated tweet with YouTube link and hashtags</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">🖥️</div>
+        <div class="tech-name">Hetzner VPS</div>
+        <div class="tech-role">CPX32 — 8GB RAM, Ubuntu 24.04, Docker, systemd services, cron scheduling</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-icon">⏰</div>
+        <div class="tech-name">Cron + Webhook</div>
+        <div class="tech-role">Bulletproof scheduling — cron triggers n8n webhook every 5 hours, never misses</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Songs per Day</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100</div>
+        <div class="stat-label">Emotional Lyrics</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">20</div>
+        <div class="stat-label">Music Genres</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Human Intervention</div>
+      </div>
+    </div>
+
+    <div class="access-box">
+      <h2>Listen <span>Now</span></h2>
+      <p style="color: var(--text-muted); margin-top: 0.5rem;">Every song is a one-of-a-kind emotional journey — AI-composed, never repeated.</p>
+      <div class="access-links">
+        <a href="https://www.youtube.com/@WordsBetweenSilence" class="cta cta-primary" target="_blank">▶ YouTube Channel</a>
+        <a href="https://x.com/Ibrahim60527521" class="cta cta-secondary" target="_blank">𝕏 AI Journey</a>
+        <a href="https://automateflows.org" class="cta cta-secondary" target="_blank">🤖 AutomateFlows</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Built by <a href="https://automateflows.org" target="_blank">AutomateFlows</a> — AI Automation for SMBs</p>
+  <p style="margin-top: 0.5rem; opacity: 0.6;">Words Between Silence is a project by AI Journey &bull; Powered by Suno AI, SiliconFlow, n8n &bull; 2026</p>
+</footer>
+
+</body>
+</html>
