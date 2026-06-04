@@ -15,8 +15,23 @@ const reduceMotion =
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const MAILTO =
-  'mailto:hello@automateflows.org?subject=Automation%20inquiry%20%E2%80%94%20AutomateFlows.org'
+const EMAIL = 'hello@automateflows.org'
+const EMAIL_SUBJECT = 'Automation inquiry — AutomateFlows.org'
+const EMAIL_BODY = `Hi AutomateFlows,
+
+I'd like to automate the following in my business:
+
+
+What I'm hoping to achieve:
+
+
+Thanks,`
+
+// Opens a Gmail compose window pre-filled and ready to send TO ${EMAIL}.
+// (The visitor is the sender; the message is addressed to hello@automateflows.org.)
+const GMAIL_COMPOSE =
+  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(EMAIL)}` +
+  `&su=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`
 
 // Web3Forms access key (public/safe to embed client-side). Submissions are
 // emailed to the address registered with this key at web3forms.com.
@@ -319,7 +334,7 @@ function Navbar() {
           </ul>
           <div className="flex items-center gap-2">
             <a
-              href={MAILTO}
+              href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer"
               className="magnetic-btn hidden sm:inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white glow-primary"
             >
               Email Me <ArrowUpRight className="h-4 w-4" />
@@ -363,7 +378,7 @@ function Navbar() {
             </a>
           ))}
           <a
-            href={MAILTO}
+            href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer"
             onClick={() => setOpen(false)}
             className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-semibold text-white"
           >
@@ -444,7 +459,7 @@ function Hero() {
 
         <div className="mt-10 flex flex-wrap gap-3">
           <a
-            href={MAILTO}
+            href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer"
             className="hero-cta magnetic-btn inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 font-semibold text-white glow-primary"
           >
             <Mail className="h-4 w-4" /> Email Me <ArrowUpRight className="h-4 w-4" />
@@ -456,6 +471,18 @@ function Hero() {
             See My Work <ArrowRight className="h-4 w-4" />
           </a>
         </div>
+
+        <p className="hero-cta mt-6 font-mono text-sm text-muted">
+          Or email me directly:{' '}
+          <a
+            href={GMAIL_COMPOSE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent underline-offset-4 hover:underline"
+          >
+            {EMAIL}
+          </a>
+        </p>
       </div>
     </section>
   )
@@ -1000,7 +1027,7 @@ function Pricing() {
               </ul>
 
               <a
-                href={MAILTO}
+                href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer"
                 className={`magnetic-btn mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold ${
                   tier.featured ? 'bg-primary text-white glow-primary' : 'border border-divider text-ink hover:bg-white/[0.04]'
                 }`}
@@ -1065,7 +1092,7 @@ function Contact() {
           </p>
 
           <div className="mt-10 space-y-3">
-            <a href={MAILTO} className="flex items-center gap-4 rounded-2xl card-border bg-surface p-4 transition-colors hover:bg-surface-hover">
+            <a href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-2xl card-border bg-surface p-4 transition-colors hover:bg-surface-hover">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/15 text-primary-light"><Mail className="h-5 w-5" /></span>
               <div>
                 <div className="text-sm font-semibold text-ink">hello@automateflows.org</div>
@@ -1144,7 +1171,7 @@ function Contact() {
               {status === 'error' ? (
                 <p className="mt-4 text-center font-mono text-[11px] text-red-400">
                   Something went wrong. Please email{' '}
-                  <a href={MAILTO} className="underline hover:text-red-300">hello@automateflows.org</a> directly.
+                  <a href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">hello@automateflows.org</a> directly.
                 </p>
               ) : (
                 <p className="mt-4 text-center font-mono text-[11px] text-muted">
@@ -1187,6 +1214,14 @@ function Footer() {
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted">
               Custom AI-powered automation systems for modern businesses. Built to run while you sleep.
             </p>
+            <a
+              href={GMAIL_COMPOSE}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex w-fit items-center gap-2 text-sm font-semibold text-ink transition-colors hover:text-accent"
+            >
+              <Mail className="h-4 w-4 text-accent" /> {EMAIL}
+            </a>
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-divider px-3 py-1.5">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-accent ring-pulse" />
@@ -1211,7 +1246,7 @@ function Footer() {
               <li><a href="#process" className="text-muted transition-colors hover:text-ink">Process</a></li>
               <li><a href="#work" className="text-muted transition-colors hover:text-ink">Portfolio</a></li>
               <li><a href="#pricing" className="text-muted transition-colors hover:text-ink">Pricing</a></li>
-              <li><a href={MAILTO} className="text-muted transition-colors hover:text-ink">Contact</a></li>
+              <li><a href={GMAIL_COMPOSE} target="_blank" rel="noopener noreferrer" className="text-muted transition-colors hover:text-ink">Contact</a></li>
             </ul>
           </div>
 
