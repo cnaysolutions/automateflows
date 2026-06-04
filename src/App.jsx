@@ -18,6 +18,10 @@ const reduceMotion =
 const MAILTO =
   'mailto:hello@automateflows.org?subject=Automation%20inquiry%20%E2%80%94%20AutomateFlows.org'
 
+// Web3Forms access key (public/safe to embed client-side). Submissions are
+// emailed to the address registered with this key at web3forms.com.
+const WEB3FORMS_ACCESS_KEY = '7b37b45a-1682-49b9-8551-ac7a79d9de3f'
+
 /* ---------------------------------- data ---------------------------------- */
 
 const NAV_LINKS = [
@@ -1014,22 +1018,34 @@ function Pricing() {
 /* --------------------------------- contact --------------------------------- */
 
 function Contact() {
-  const [status, setStatus] = useState('idle')
-  const [form, setForm] = useState({ name: '', email: '', company: '', message: '' })
+  const [status, setStatus] = useState('idle') // 'idle' | 'sending' | 'sent' | 'error'
+  const [form, setForm] = useState({ name: '', email: '', company: '', message: '', botcheck: '' })
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
+    if (status === 'sending') return
+    if (form.botcheck) return // honeypot tripped — silently drop bots
     setStatus('sending')
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nCompany: ${form.company}\n\n${form.message}`
-    )
-    const href = `mailto:hello@automateflows.org?subject=${encodeURIComponent(
-      'Automation inquiry — AutomateFlows.org'
-    )}&body=${body}`
-    setTimeout(() => {
-      window.location.href = href
-      setStatus('sent')
-    }, 1000)
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: 'New automation inquiry — AutomateFlows.org',
+          from_name: 'AutomateFlows website',
+          name: form.name,
+          email: form.email,
+          company: form.company || '—',
+          message: form.message,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) setStatus('sent')
+      else setStatus('error')
+    } catch {
+      setStatus('error')
+    }
   }
 
   const update = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -1078,14 +1094,24 @@ function Contact() {
             <div className="grid h-full min-h-[420px] place-items-center rounded-3xl card-border bg-surface p-10 text-center">
               <div>
                 <CheckCircle2 className="mx-auto h-14 w-14 text-accent" />
-                <h3 className="mt-6 font-display text-2xl font-bold text-ink">Thanks — your email is ready to send.</h3>
+                <h3 className="mt-6 font-display text-2xl font-bold text-ink">Thanks — your message is on its way.</h3>
                 <p className="mx-auto mt-3 max-w-sm text-muted">
-                  Your email client just opened with the details filled in. Hit send and I'll get back to you shortly.
+                  I've got your details and I'll get back to you shortly — usually within a day.
                 </p>
               </div>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="rounded-3xl card-border bg-surface p-7 sm:p-9">
+              {/* honeypot — hidden from humans, catches bots */}
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.botcheck}
+                onChange={update('botcheck')}
+                className="hidden"
+                aria-hidden="true"
+              />
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field label="Name" value={form.name} onChange={update('name')} required placeholder="Jane Doe" />
                 <Field label="Email" type="email" value={form.email} onChange={update('email')} required placeholder="jane@company.com" />
@@ -1110,14 +1136,21 @@ function Contact() {
                 className="magnetic-btn mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-semibold text-white glow-primary disabled:opacity-70"
               >
                 {status === 'sending' ? (
-                  <>Preparing…</>
+                  <>Sending…</>
                 ) : (
                   <>Send <Send className="h-4 w-4" /></>
                 )}
               </button>
-              <p className="mt-4 text-center font-mono text-[11px] text-muted">
-                Opens your email app — your details stay between us.
-              </p>
+              {status === 'error' ? (
+                <p className="mt-4 text-center font-mono text-[11px] text-red-400">
+                  Something went wrong. Please email{' '}
+                  <a href={MAILTO} className="underline hover:text-red-300">hello@automateflows.org</a> directly.
+                </p>
+              ) : (
+                <p className="mt-4 text-center font-mono text-[11px] text-muted">
+                  Sent straight to my inbox — your details stay between us.
+                </p>
+              )}
             </form>
           )}
         </div>
