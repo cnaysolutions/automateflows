@@ -1185,9 +1185,9 @@ function Footer() {
           <div>
             <h4 className="font-mono text-xs uppercase tracking-widest text-muted">Connect</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted transition-colors hover:text-ink"><Linkedin className="h-4 w-4" /> LinkedIn</a></li>
+              <li><a href="https://www.linkedin.com/in/baser-ibrahim-brussels/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted transition-colors hover:text-ink"><Linkedin className="h-4 w-4" /> LinkedIn</a></li>
               <li><a href="https://x.com/Ibrahim60527521" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted transition-colors hover:text-ink"><XIcon className="h-4 w-4" /> X / Twitter</a></li>
-              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted transition-colors hover:text-ink"><Github className="h-4 w-4" /> GitHub</a></li>
+              <li><a href="https://github.com/cnaysolutions/automateflows" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-muted transition-colors hover:text-ink"><Github className="h-4 w-4" /> GitHub</a></li>
             </ul>
           </div>
         </div>
